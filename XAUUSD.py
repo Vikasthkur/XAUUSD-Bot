@@ -1,11 +1,11 @@
-import os
 import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from datetime import datetime
 import pytz
+import os
 
-# 🔑 Tokens (Railway Variables से लेंगे)
+# 🔑 Tokens from Environment Variables
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 API_KEY = os.getenv("API_KEY")
 
@@ -33,7 +33,7 @@ async def xau_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard.append([InlineKeyboardButton(f"5-min {h}H", callback_data=f"5min_{h}h")])
 
     # 15-min interval buttons (1H → 21H)
-    tf_15 = [1, 2, 3, 4, 5, 6, 9, 12, 18, 21]
+    tf_15 = [1,2,3,4,5,6,9,12,18,21]
     for h in tf_15:
         keyboard.append([InlineKeyboardButton(f"15-min {h}H", callback_data=f"15min_{h}h")])
 
@@ -54,11 +54,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Map number of candles
     candles_map = {}
     if interval == "5min":
-        candles_map = {"1h": 12, "2h": 24, "3h": 36, "4h": 48, "5h": 60}
+        candles_map = {"1h":12,"2h":24,"3h":36,"4h":48,"5h":60}
     elif interval == "15min":
-        candles_map = {"1h": 4, "2h": 8, "3h": 12, "4h": 16, "5h": 20, "6h": 24, "9h": 36, "12h": 48, "18h": 72, "21h": 84}
+        candles_map = {"1h":4,"2h":8,"3h":12,"4h":16,"5h":20,"6h":24,"9h":36,"12h":48,"18h":72,"21h":84}
     elif interval == "1h":
-        candles_map = {f"{h}h": h for h in range(6, 61, 6)}
+        candles_map = {f"{h}h":h for h in range(6,61,6)}
 
     outputsize = candles_map.get(tf)
     if not outputsize:
@@ -86,11 +86,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ✅ Main Function
 def main():
-    if not BOT_TOKEN:
-        raise ValueError("❌ BOT_TOKEN is missing. Please set it in Railway Variables.")
-    if not API_KEY:
-        raise ValueError("❌ API_KEY is missing. Please set it in Railway Variables.")
-
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("xau", xau_command))
     app.add_handler(CallbackQueryHandler(button_handler))
